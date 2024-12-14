@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback  } from 'react';
 import './index.css'; 
 import fortaleza from './media/logo-png.png'
 // import { logDOM } from '@testing-library/react';
@@ -11,29 +11,31 @@ const App = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const fetchBot = async () => {
+  const fetchBot = useCallback(async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/chatbot/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({'input': inputMessage})
+        body: JSON.stringify({'input': messages[messages.length - 1].text})
       });
       
       if(!response.ok) {
         throw new Error(`Network response was not okay. Status: ${response.status}`);
       }
       const data = await response.json()
-      addMessage(data[0].answer, 'bot');
+      addMessage(data.answer, 'bot');
     } catch (error) {
       console.error('Error: ', error);
     }
-  }
+  }, [messages]);
 
   useEffect(() => {
-    fetchBot();
-    console.log(inputMessage);
+    if(messages.length > 0 && messages[messages.length - 1].sender === 'user') {
+      fetchBot();
+      console.log(messages[messages.length - 1]);
+    }
   }, [messages]);
 
   const suggestions = [
@@ -43,7 +45,7 @@ const App = () => {
     'Quais projetos de bolsa a Juventude de Fortaleza oferece?',
   ];
 
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = (suggestion) => { 
     addMessage(suggestion, 'user');
     setInputMessage(inputMessage);
   };
@@ -57,7 +59,7 @@ const App = () => {
     e.preventDefault();
     if (inputMessage.trim()) {
       addMessage(inputMessage, 'user');
-      setInputMessage(inputMessage);
+      setInputMessage('');
       setIsTyping(false);
     }
   };
@@ -130,6 +132,8 @@ const App = () => {
         <button
           type="submit"
           className="bg-[#FFCC54] py-[0.8vh] px-[0.6vw] absolute right-3 text-white rounded-[1vh] shadow-lg hover:bg-[#e2a821] transition duration-200  flex items-center justify-center"
+          onClick={() => {
+          }}
         >
           <FontAwesomeIcon icon={faArrowRight} style={{color: "#000000", height: '3vh'}} />
         </button>

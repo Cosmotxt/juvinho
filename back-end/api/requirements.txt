@@ -1,11 +1,10 @@
-langchain-cli
-langchain
 langchain-groq
+langchain-community
 pypdf
 sentence-transformers
+pinecone
 langchain_huggingface
 langchain-qdrant
 langchain-pinecone
-pinecone
 unstructured
-python-dotenv
+langgraph
